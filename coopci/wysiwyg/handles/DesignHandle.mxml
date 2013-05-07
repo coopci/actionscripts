@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  width="3" height="3" mouseDown="button1_mouseDownHandler(event)"
+		  mouseOut="button1_mouseOutHandler(event)" mouseOver="button1_mouseOverHandler(event)" initialize="button1_initializeHandler(event)"
+		
+		  >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.CursorManager;
+			
+			
+			
+			public var enableX:Boolean = true;
+			public var enableY:Boolean = true;
+			
+			private var _originalStageX:int = 0;
+			private var _originalStageY:int = 0;
+			
+			private var _originalSelfX:int = 0;
+			private var _originalSelfY:int = 0;
+			
+			public function getXoffset():int{
+				return 0;
+			}
+			public function getYoffset():int{
+				return 0;
+			}
+			
+			
+			//private var  _parent:UIComponent = null;
+			public function getCursor():Class {
+				return null;
+			}
+			public function button1_mouseOverHandler(event:MouseEvent):void
+			{
+				CursorManager.setCursor( this.getCursor() );
+			}
+			
+			public function button1_mouseOutHandler(event:MouseEvent):void
+			{
+				CursorManager.removeCursor(CursorManager.currentCursorID);
+			}
+			
+			protected function button1_mouseDownHandler(event:MouseEvent):void
+			{
+				this._originalStageX = stage.mouseX;
+				this._originalStageY = stage.mouseY;
+				
+				this._originalSelfX = this.x;
+				this._originalSelfY = this.y
+				
+				stage.addEventListener(MouseEvent.MOUSE_MOVE, _moving);
+				stage.addEventListener(MouseEvent.MOUSE_UP, _stopmoving);
+				
+				this.dispatchEvent( new HandleEvent ( HandleEvent.MOVE_BEGIN ));
+			}
+			
+			private function _moving(e:MouseEvent):void{
+				var deltaX:int = stage.mouseX - this._originalStageX;
+				var deltaY:int = stage.mouseY - this._originalStageY;
+				
+				if( this.enableX){
+					this.x = this._originalSelfX + deltaX;}
+				if( this.enableY){
+					this.y = this._originalSelfY + deltaY;   }  
+				
+				this.dispatchEvent( new HandleEvent ( HandleEvent.MOVE_PROGRESS ));
+				
+			}
+			
+			private function _stopmoving(e:MouseEvent):void{
+				stage.removeEventListener(MouseEvent.MOUSE_MOVE, _moving);
+				stage.removeEventListener(MouseEvent.MOUSE_UP, _stopmoving);
+				
+				this.dispatchEvent( new HandleEvent ( HandleEvent.MOVE_END ));
+			}
+			
+			protected function button1_initializeHandler(event:FlexEvent):void
+			{
+				this.width = 5;
+				this.height = 5;
+			}
+			
+			
+			
+			
+			public function getDeltaY():int{
+				if( this.enableY){
+					var deltaY:int = stage.mouseY - this._originalStageY;
+					return deltaY;
+				}else{
+					return 0;
+				}
+			}
+			public function getDeltaX():int{
+				if (this.enableX){
+					var deltaX:int = stage.mouseX - this._originalStageX;
+					return deltaX;
+				}else{
+					return 0;
+				}
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+</s:Button>

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:handles="coopci.wysiwyg.handles.*"
+		 width="400" height="300"  initialize="group1_initializeHandler(event)" render="group1_renderHandler(event)" addedToStage="group1_addedToStageHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import coopci.wysiwyg.handles.*;
+			
+			import mx.events.FlexEvent;
+			
+			public function drawBorderLines():void {
+				
+				
+				
+				this.graphics.clear();
+				
+				
+				this.graphics.lineStyle(3,0x00ff00);
+				
+				this.graphics.moveTo( 0 , 0 )
+				this.graphics.lineTo( this.width , 0 );
+				this.graphics.lineTo( this.width , this.height );
+				this.graphics.lineTo( 0 , this.height );
+				this.graphics.lineTo( 0 , 0 );
+				
+				
+				this.graphics.lineStyle(1,0xff0000);
+				this.graphics.moveTo( this.handleLeft.x , this.handleTop.y )
+				this.graphics.lineTo( this.handleRight.x , this.handleTop.y );
+				this.graphics.lineTo( this.handleRight.x , this.handleBottom.y );
+				this.graphics.lineTo( this.handleLeft.x  , this.handleBottom.y );
+				this.graphics.lineTo( this.handleLeft.x  , this.handleTop.y );
+				
+			}
+			
+			private function _place_handles():void{
+				this.handleRight.enableY = false;
+				this.handleRight.enableX = true;
+				this.handleRight.x = this.width;
+				this.handleRight.y = this.height / 2;
+				
+				this.handleLeft.enableY = false;
+				this.handleLeft.enableX = true;
+				this.handleLeft.x = 0;
+				this.handleLeft.y = this.height / 2;
+				
+				this.handleTop.enableY = true;
+				this.handleTop.enableX = false;
+				this.handleTop.y = 0;
+				this.handleTop.x = this.width / 2;
+				
+				this.handleBottom.enableY = true;
+				this.handleBottom.enableX = false;
+				this.handleBottom.y = this.height;
+				this.handleBottom.x = this.width / 2;
+				
+				this.handleMover.x = 0;
+				this.handleMover.y = 0;
+				this.handleMover.height = this.height;
+				this.handleMover.width = this.width;
+			
+			}
+			protected function group1_initializeHandler(event:FlexEvent):void
+			{
+				this._place_handles();
+				
+				this.handleLeft.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_left_handle_move_progress);
+				this.handleTop.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_top_handle_move_progress);
+				this.handleRight.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_right_handle_move_progress);
+				this.handleBottom.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_bottom_handle_move_progress);
+				
+				this.handleLeft.addEventListener( HandleEvent.MOVE_END , this.on_left_handle_move_end);
+				this.handleTop.addEventListener( HandleEvent.MOVE_END , this.on_top_handle_move_end);
+				this.handleRight.addEventListener( HandleEvent.MOVE_END , this.on_right_handle_move_end);
+				this.handleBottom.addEventListener( HandleEvent.MOVE_END , this.on_bottom_handle_move_end);
+				
+				
+					
+				this.handleLeft.addEventListener( HandleEvent.MOVE_BEGIN , this.on_left_handle_move_begin);
+				this.handleTop.addEventListener( HandleEvent.MOVE_BEGIN , this.on_top_handle_move_begin);
+				
+		
+				
+				this.handleMover.addEventListener( HandleEvent.MOVE_BEGIN , this.on_mover_handle_move_begin);
+				this.handleMover.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_mover_handle_move_progress);
+				this.handleMover.addEventListener( HandleEvent.MOVE_END , this.on_mover_handle_move_end);
+				this.handleMover.addEventListener( MouseEvent.DOUBLE_CLICK , this.on_mover_handle_dbclick);
+				
+				return;
+			}
+			
+			private  var _originalSelfX:int = 0;
+			private var _originalSelfY:int = 0;
+			private function on_left_handle_move_begin(event:Event):void
+			{
+				_originalSelfX = this.x;
+			}
+			
+			private function on_top_handle_move_begin(event:Event):void
+			{
+				_originalSelfY = this.y;
+			}
+			
+			private function on_right_handle_move_progress(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.handleTop.x = this.handleBottom.x = this.handleLeft.x + ( this.handleRight.x - this.handleLeft.x) /2 ;
+			}
+			
+			private function on_left_handle_move_progress(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.handleTop.x = this.handleBottom.x = this.handleLeft.x + ( this.handleRight.x - this.handleLeft.x) /2 ;
+			}
+			
+			private function on_top_handle_move_progress(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.handleLeft.y = this.handleRight.y = this.handleTop.y + ( this.handleBottom.y - this.handleTop.y) /2 ;
+			}
+			
+			private function on_bottom_handle_move_progress(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.handleLeft.y = this.handleRight.y = this.handleTop.y + ( this.handleBottom.y - this.handleTop.y) /2 ;
+			}
+			
+			private function on_mover_handle_dbclick(event:Event):void
+			{
+				trace("on_mover_handle_dbclick");
+			}
+			
+			
+			
+			private var _originalX:int = 0;
+			private var _originalY:int = 0;
+			private function on_mover_handle_move_begin(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				_originalX = this.x ;
+				_originalY = this.y ;
+			}
+			
+			private function on_mover_handle_move_progress(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				this.x = _originalX + this.handleMover.getDeltaX();
+				this.y = _originalY + this.handleMover.getDeltaY();
+				
+				this.handleMover.x = 0;
+				this.handleMover.y = 0;
+				
+			}
+			
+			private function on_mover_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				//this.x = this.handleMover.getDeltaX();
+				//this.y = this.handleMover.getDeltaY();
+				//this.handleMover.x = 0;
+				//this.handleMover.y = 0;
+				
+			}
+			
+			
+			private function _on_handles_move_end():void{
+				var deltaX:int = this.handleLeft.x;
+				var deltaY:int = this.handleTop.y ;
+				
+				var newWidth:int = this.handleRight.x - this.handleLeft.x ;
+				var newHeight:int = this.handleBottom.y - this.handleTop.y ;
+				
+				this.x += deltaX;
+				this.y += deltaY;
+				this.width = newWidth;
+				this.height = newHeight;
+				
+				
+				this.handleLeft.x = 0;
+				this.handleTop.y = 0;
+			}
+			private function on_right_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				this.width = this.handleRight.x;
+				this._place_handles();
+			}
+			
+			private function on_left_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				
+				var newWidth:int = this.handleRight.x - this.handleLeft.x;
+				this.x += this.handleLeft.x;
+				this.width = newWidth;
+				this.handleRight.x = newWidth;
+				this.handleLeft.x = 0;
+				
+				this._place_handles();
+				
+			}
+			
+			
+			private function on_top_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				
+				
+				var newHeight:int = this.handleBottom.y - this.handleTop.y;
+				this.y += this.handleTop.y;
+				this.height = newHeight;
+				this.handleBottom.y = newHeight;
+				this.handleTop.y = 0;
+				
+				this._place_handles();
+				
+				
+			}
+			
+			private function on_bottom_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.height = this.handleBottom.y;
+				this._place_handles();
+			}
+			
+			
+			
+			protected function group1_renderHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				drawBorderLines();
+			}
+			
+			protected function group1_addedToStageHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				stage.invalidate();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<handles:DesignHandleMover id="handleMover" x="155" y="135"/>
+	<handles:DesignHandleLeft id="handleLeft" x="0" y="135"/>
+	<handles:DesignHandleRight id="handleRight" x="330" y="135"/>
+	<handles:DesignHandleTop id="handleTop" x="165" y="0"/>
+	<handles:DesignHandleBottom id="handleBottom" x="165" y="279"/>
+	
+</s:Group>

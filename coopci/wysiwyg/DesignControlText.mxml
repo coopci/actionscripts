@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wysiwyg1:DesignControl xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:wysiwyg="com.tudou.baozou.wysiwyg.*" width="400" height="300"
+					   initialize="designcontrol1_initializeHandler(event)" xmlns:wysiwyg1="coopci.wysiwyg.*" 
+					   
+					   >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import coopci.wysiwyg.handles.*;
+			
+			protected function designcontrol1_initializeHandler(event:FlexEvent):void
+			{
+				this.handleRight.addEventListener( HandleEvent.MOVE_END , this.on_right_hangle_move_end);
+				this.handleLeft.addEventListener( HandleEvent.MOVE_END , this.on_left_hangle_move_end);
+				this.handleTop.addEventListener( HandleEvent.MOVE_END , this.on_top_hangle_move_end);
+				this.handleBottom.addEventListener( HandleEvent.MOVE_END , this.on_bottom_hangle_move_end);
+				
+				txtInput.x = 1;
+				txtInput.y = 1;
+				txtInput.height = this.height / 2;
+				txtInput.width = this.width / 2;
+				return;
+			}
+			public override function set mxmlContent(value:Array):void
+			{
+				var len:int = super.numElements;
+				for (var i:int = len - 1; i >= 0; --i)
+					value.push(super.getElementAt(i));
+				super.mxmlContent = value;
+			}
+			
+			
+			private function on_right_hangle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				txtInput.x = 1;
+				txtInput.y = 1;
+				txtInput.height = this.height / 2;
+				txtInput.width = this.width / 2;
+				
+					
+			}
+			
+			private function on_left_hangle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				txtInput.x = 1;
+				txtInput.y = 1;
+				txtInput.height = this.height / 2;
+				txtInput.width = this.width / 2;
+			}
+			
+			private function on_top_hangle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				txtInput.x = 1;
+				txtInput.y = 1;
+				txtInput.height = this.height / 2;
+				txtInput.width = this.width / 2;
+				
+			}
+			
+			private function on_bottom_hangle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				txtInput.x = 1;
+				txtInput.y = 1;
+				txtInput.height = this.height / 2;
+				txtInput.width = this.width / 2;
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:TextArea x="1" y="1" text="lala" id="txtInput" />
+</wysiwyg1:DesignControl>

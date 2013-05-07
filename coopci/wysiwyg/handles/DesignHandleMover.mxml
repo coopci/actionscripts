@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<handles:DesignHandle xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:handles="coopci.wysiwyg.handles.*"
+					  alpha="0.9" initialize="designhandle1_initializeHandler(event)" doubleClickEnabled="true">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			[Embed("assets/1367825417_cursor_drag_arrow.png")]
+			private var _cursor:Class;
+			override public function getCursor():Class {
+				return _cursor;
+			}
+			
+			
+			protected function designhandle1_initializeHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				this.width = 20;
+				this.height = 20;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+</handles:DesignHandle>
