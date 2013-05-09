@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wysiwyg:SlidingContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:wysiwyg="coopci.wysiwyg.*" 
+						  width="400" height="100" initialize="slidingcontainer1_initializeHandler(event)"
+						  addedToStage="slidingcontainer1_addedToStageHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import coopci.wysiwyg.handles.*;
+			
+			import mx.events.FlexEvent;
+			
+			
+			private function _place_inners():void{
+				this.innerSlider.y = this.handleMover.height;
+				this.innerSlider.height = this.height - this.handleMover.height;
+				
+				var global_pos:Point = this.localToGlobal( new Point(0 , 0 ) );
+				this.innerSlider.maxStageX = global_pos.x + this.width;
+				this.innerSlider.minStageX = global_pos.x ;
+				
+				this.innerSlider.maxStageY = global_pos.y + this.height;
+				this.innerSlider.minStageY = global_pos.y ;
+				this.innerSlider.place_handles();
+				
+				var innerSliderStagePos:Point = this.innerSlider.localToGlobal( new Point ( 0 , 0 )) ;
+				//if ( this.handleLeft.maxStageX > innerSliderStagePos.x + this.handleLeft.width )
+					this.handleLeft.maxStageX = innerSliderStagePos.x + this.handleLeft.width;
+						
+				//if ( this.handleRight.minStageX < innerSliderStagePos.x + this.innerSlider.width )
+					this.handleRight.minStageX = innerSliderStagePos.x+ this.innerSlider.width ;
+				
+					
+				
+			}
+			
+			
+			public override function set mxmlContent(value:Array):void
+			{
+				var len:int = super.numElements;
+				for (var i:int = len - 1; i >= 0; --i)
+					value.push(super.getElementAt(i));
+				super.mxmlContent = value;
+			}
+			
+			
+			private function on_right_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this._place_inners();
+			}
+			
+			private function on_left_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				var deltaX:Number = this.handleLeft.getRestrictedDeltaX();
+				if (this.innerSlider.x - deltaX < 0)
+					this.innerSlider.x = 0;
+				else
+					this.innerSlider.x -= deltaX;
+				
+				this._place_inners();
+				
+			}
+			
+			private function on_mover_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this._place_inners();
+				
+			}
+			
+			private function on_inner_slider_dimension_change(event:Event):void
+			{
+				this._place_inners();
+				return;
+			}
+			protected function slidingcontainer1_initializeHandler(event:FlexEvent):void
+			{	
+				this.handleRight.addEventListener( HandleEvent.MOVE_END , this.on_right_handle_move_end);
+				this.handleLeft.addEventListener( HandleEvent.MOVE_END , this.on_left_handle_move_end);
+				this.handleMover.addEventListener( HandleEvent.MOVE_END , this.on_mover_handle_move_end);
+				
+				this.innerSlider.addEventListener( DesignControlDimensionEvent.DIMENSION_CHANGED , this.on_inner_slider_dimension_change);
+			}
+			
+			protected function slidingcontainer1_addedToStageHandler(event:Event):void
+			{
+				this._place_inners();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<wysiwyg:SlidingContainer id="innerSlider" x="0" y="145">
+	</wysiwyg:SlidingContainer>
+</wysiwyg:SlidingContainer>

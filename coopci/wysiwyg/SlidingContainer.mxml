@@ -17,8 +17,6 @@
 				
 				
 				this.graphics.clear();
-				
-				
 				this.graphics.lineStyle(3,0x00ff00);
 				
 				this.graphics.moveTo( 0 , 0 )
@@ -29,61 +27,82 @@
 				
 				
 				this.graphics.lineStyle(1,0xff0000);
-				this.graphics.moveTo( this.handleLeft.x , this.handleTop.y )
-				this.graphics.lineTo( this.handleRight.x , this.handleTop.y );
-				this.graphics.lineTo( this.handleRight.x , this.handleBottom.y );
-				this.graphics.lineTo( this.handleLeft.x  , this.handleBottom.y );
-				this.graphics.lineTo( this.handleLeft.x  , this.handleTop.y );
+				this.graphics.moveTo( this.handleLeft.x , 0 )
+				this.graphics.lineTo( this.handleRight.x , 0 );
+				this.graphics.lineTo( this.handleRight.x , this.height );
+				this.graphics.lineTo( this.handleLeft.x  , this.height );
+				this.graphics.lineTo( this.handleLeft.x  , 0);
+				
+			}
+			public var minDesignWidth:int = 15;
+			public var minDesignHeight:int = 15;
+			
+			public var minStageX:int = -1;
+			public var maxStageX:int = -1;
+			public var minStageY:int = -1;
+			public var maxStageY:int = -1;
+			
+			
+			
+			private function _restrict_handles():void{
+				
+				var global_pos:Point = this.localToGlobal( new Point(0 , 0 ) );
+				
+				this.handleLeft.minStageX = -1;
+				this.handleLeft.maxStageX = global_pos.x + this.width - this.minDesignWidth;
+				
+				this.handleRight.minStageX = global_pos.x +  this.minDesignWidth;
+				this.handleRight.maxStageX = -1;
+				
+				
+				if (this.minStageX >= 0){
+					this.handleLeft.minStageX = this.minStageX;
+					this.handleMover.minStageX = this.minStageX;// + this.handleMover.x ;
+				}
+				if (this.maxStageX >= 0){
+					this.handleRight.maxStageX = this.maxStageX + this.handleRight.width;
+					this.handleMover.maxStageX = this.maxStageX;// - (this.width - this.handleMover.x - this.handleMover.width);
+				}
 				
 			}
 			
+			
+			public function place_handles():void{
+				this._place_handles();
+			}
 			private function _place_handles():void{
 				this.handleRight.enableY = false;
 				this.handleRight.enableX = true;
 				this.handleRight.x = this.width;
 				this.handleRight.y = this.height / 2;
+				//this.handleRight.restrictDesignWidth = false;
 				
 				this.handleLeft.enableY = false;
 				this.handleLeft.enableX = true;
 				this.handleLeft.x = 0;
 				this.handleLeft.y = this.height / 2;
 				
-				this.handleTop.enableY = true;
-				this.handleTop.enableX = false;
-				this.handleTop.y = 0;
-				this.handleTop.x = this.width / 2;
-				
-				this.handleBottom.enableY = true;
-				this.handleBottom.enableX = false;
-				this.handleBottom.y = this.height;
-				this.handleBottom.x = this.width / 2;
-				
+				this.handleMover.enableY = false;
+				this.handleMover.enableX = true;
 				this.handleMover.x = 0;
 				this.handleMover.y = 0;
-				this.handleMover.height = this.height;
+				this.handleMover.height = 12;
 				this.handleMover.width = this.width;
-				
-				
-				this._restrict_handles();
 			
+				this._restrict_handles();
 			}
 			protected function group1_initializeHandler(event:FlexEvent):void
 			{
-				this._place_handles();
+				
 				
 				this.handleLeft.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_left_handle_move_progress);
-				this.handleTop.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_top_handle_move_progress);
 				this.handleRight.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_right_handle_move_progress);
-				this.handleBottom.addEventListener( HandleEvent.MOVE_PROGRESS , this.on_bottom_handle_move_progress);
 				
 				this.handleLeft.addEventListener( HandleEvent.MOVE_END , this.on_left_handle_move_end);
-				this.handleTop.addEventListener( HandleEvent.MOVE_END , this.on_top_handle_move_end);
 				this.handleRight.addEventListener( HandleEvent.MOVE_END , this.on_right_handle_move_end);
-				this.handleBottom.addEventListener( HandleEvent.MOVE_END , this.on_bottom_handle_move_end);
 				
 				
 				this.handleLeft.addEventListener( HandleEvent.MOVE_BEGIN , this.on_left_handle_move_begin);
-				this.handleTop.addEventListener( HandleEvent.MOVE_BEGIN , this.on_top_handle_move_begin);
 				
 		
 				this.handleMover.addEventListener( HandleEvent.MOVE_BEGIN , this.on_mover_handle_move_begin);
@@ -136,26 +155,14 @@
 			private function on_right_handle_move_progress(event:Event):void
 			{
 				var e:HandleEvent = event as HandleEvent;
-				this.handleTop.x = this.handleBottom.x = this.handleLeft.x + ( this.handleRight.x - this.handleLeft.x) /2 ;
 			}
 			
 			private function on_left_handle_move_progress(event:Event):void
 			{
 				var e:HandleEvent = event as HandleEvent;
-				this.handleTop.x = this.handleBottom.x = this.handleLeft.x + ( this.handleRight.x - this.handleLeft.x) /2 ;
 			}
 			
-			private function on_top_handle_move_progress(event:Event):void
-			{
-				var e:HandleEvent = event as HandleEvent;
-				this.handleLeft.y = this.handleRight.y = this.handleTop.y + ( this.handleBottom.y - this.handleTop.y) /2 ;
-			}
 			
-			private function on_bottom_handle_move_progress(event:Event):void
-			{
-				var e:HandleEvent = event as HandleEvent;
-				this.handleLeft.y = this.handleRight.y = this.handleTop.y + ( this.handleBottom.y - this.handleTop.y) /2 ;
-			}
 			
 			private function on_mover_handle_dbclick(event:Event):void
 			{
@@ -172,10 +179,7 @@
 				handle = this.handleMover; 
 				this.removeElement( handle );
 				this.addElementAt( handle , this.numElements );
-				
-				handle = this.handleBottom;
-				this.removeElement( handle );
-				this.addElementAt( handle , this.numElements );
+			
 				
 				handle = this.handleLeft;
 				this.removeElement( handle );
@@ -185,11 +189,6 @@
 				this.removeElement( handle );
 				this.addElementAt( handle  , this.numElements);
 				
-				handle = this.handleTop; 
-				this.removeElement( handle );
-				this.addElementAt( handle , this.numElements );
-			
-			
 			}
 			
 			
@@ -206,157 +205,89 @@
 			private function on_mover_handle_move_progress(event:Event):void
 			{
 				var e:HandleEvent = event as HandleEvent;
-				
-				trace("_originalX : " + _originalX );
-				trace("_originalY : " + _originalY );
-				
-				trace("getRestrictedDeltaX : " + this.handleMover.getRestrictedDeltaX() );
-				trace("getRestrictedDeltaY : " + this.handleMover.getRestrictedDeltaY() );
-				
-				
-				
-				
-				trace("set x to : " + (  _originalX + this.handleMover.getRestrictedDeltaX() ) );
-				trace("set y to : " +  ( _originalY + this.handleMover.getRestrictedDeltaY() ) );
-				this.x = _originalX + this.handleMover.getRestrictedDeltaX();
-				this.y = _originalY + this.handleMover.getRestrictedDeltaY();
+				var deltaX:Number = this.handleMover.getRestrictedDeltaX();
+				var deltaY:Number = this.handleMover.getRestrictedDeltaY();
+				this.x = _originalX + deltaX;
+				this.y = _originalY + deltaY;
 				
 				this.handleMover.x = 0;
 				this.handleMover.y = 0;
-				this._place_handles();
 				
-				return;
 			}
 			
 			private function on_mover_handle_move_end(event:Event):void
 			{
 				var e:HandleEvent = event as HandleEvent;
+				this._place_handles();
 				
-				//this.x = this.handleMover.getDeltaX();
-				//this.y = this.handleMover.getDeltaY();
-				//this.handleMover.x = 0;
-				//this.handleMover.y = 0;
-				
-			}
-			
-			public var minDesignWidth:int = 15;
-			public var minDesignHeight:int = 15;
-			
-			public var minDesignX:int = 0;
-			public var maxDesignX:int = 1000;
-			public var minDesignY:int = 0;
-			public var maxDesignY:int = 1000;
-			
-			
-			private function _restrict_handles():void{
-				var global_pos:Point = this.localToGlobal( new Point(0 , 0 ) );
-				
-				this.handleLeft.minStageX = -1;
-				this.handleLeft.maxStageX = global_pos.x + this.width - this.minDesignWidth;
-				
-				this.handleRight.minStageX = global_pos.x +  this.minDesignWidth;
-				this.handleRight.maxStageX = -1;
-				
-				
-				
-				this.handleTop.minStageY = -1;
-				this.handleTop.maxStageY = global_pos.y + this.height - this.minDesignHeight;
-				
-				this.handleBottom.minStageY = global_pos.y +  this.minDesignHeight;
-				this.handleBottom.maxStageY = -1;
-				
-				
+				this.dispatchEvent( new DesignControlDimensionEvent (DesignControlDimensionEvent.DIMENSION_CHANGED) );
 				
 			}
 			
 			
-			private function on_right_handle_move_end(event:Event):void
-			{
-				var e:HandleEvent = event as HandleEvent;
+			private function _on_handles_move_end():void{
+				var deltaX:int = this.handleLeft.x;
+				
+				
 				var newWidth:int = this.handleRight.x - this.handleLeft.x ;
-				if ( newWidth < minDesignWidth ){
-					newWidth = minDesignWidth;
-				}
+				
+				this.x += deltaX;
 				this.width = newWidth;
 				
 				
+				this.handleLeft.x = 0;
+			
+			}
+			private function on_right_handle_move_end(event:Event):void
+			{
+				var e:HandleEvent = event as HandleEvent;
+				this.width = this.handleRight.x;
 				this._place_handles();
+				this.dispatchEvent( new DesignControlDimensionEvent (DesignControlDimensionEvent.DIMENSION_CHANGED) );
 			}
 			
 			private function on_left_handle_move_end(event:Event):void
 			{
 				var e:HandleEvent = event as HandleEvent;
 				
-				var newWidth:int = this.handleRight.x - this.handleLeft.x ;
-				if ( newWidth < minDesignWidth ){
-					newWidth = minDesignWidth;
-				}
 				
-				
+				var newWidth:int = this.handleRight.x - this.handleLeft.x;
 				this.x += this.handleLeft.x;
 				this.width = newWidth;
 				this.handleRight.x = newWidth;
 				this.handleLeft.x = 0;
 				
-				
 				this._place_handles();
+				
+				this.dispatchEvent( new DesignControlDimensionEvent (DesignControlDimensionEvent.DIMENSION_CHANGED) );
 				
 			}
 			
-			
-			private function on_top_handle_move_end(event:Event):void
-			{
-				var e:HandleEvent = event as HandleEvent;
-				
-				
-				var newHeight:int = this.handleBottom.y - this.handleTop.y ;
-				if ( newHeight < minDesignHeight){
-					newHeight = minDesignHeight;
-				}
-				this.y += this.handleTop.y;
-				this.height = newHeight;
-				this.handleBottom.y = newHeight;
-				this.handleTop.y = 0
-				this._place_handles();
-			}
-			
-			private function on_bottom_handle_move_end(event:Event):void
-			{
-				var e:HandleEvent = event as HandleEvent;
-				var newHeight:int = this.handleBottom.y;
-				if ( newHeight < minDesignHeight){
-					newHeight = minDesignHeight;
-				}
-				this.height = newHeight;
-				
-				this._place_handles();
-			}
 			
 			
 			
 			protected function group1_renderHandler(event:Event):void
 			{
-				// TODO Auto-generated method stub
 				drawBorderLines();
+				
 			}
 			
 			protected function group1_addedToStageHandler(event:Event):void
 			{
-				
+				this._place_handles();
 				stage.addEventListener( MouseEvent.CLICK , this.on_stage_click);
 				
 				stage.invalidate();
 			}
+			
 			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<handles:DesignHandleMover id="handleMover" x="155" y="135"/>
-	<handles:DesignHandleLeft id="handleLeft" x="0" y="135"/>
-	<handles:DesignHandleRight id="handleRight" x="330" y="135"/>
-	<handles:DesignHandleTop id="handleTop" x="165" y="0"/>
-	<handles:DesignHandleBottom id="handleBottom" x="165" y="279"/>
+	<handles:DesignHandleMover id="handleMover" top="0" horizontalCenter="0"/>
+	<handles:DesignHandleLeft id="handleLeft" x="0" verticalCenter="0"/>
+	<handles:DesignHandleRight id="handleRight" x="330" width="100" height="30" verticalCenter="0"/>
 	
 </s:Group>

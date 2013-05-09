@@ -12,13 +12,18 @@
 			import mx.events.FlexEvent;
 			import mx.managers.CursorManager;
 			
-			
+			//public var maxDeltaX:int = 5;
+			//public var maxDeltaY:int = 5;
 			
 			public var enableX:Boolean = true;
 			public var enableY:Boolean = true;
 			
+			private var _originalStageMouseX:int = 0;
+			private var _originalStageMouseY:int = 0;
+			
 			private var _originalStageX:int = 0;
 			private var _originalStageY:int = 0;
+			
 			
 			private var _originalSelfX:int = 0;
 			private var _originalSelfY:int = 0;
@@ -47,8 +52,13 @@
 			
 			protected function button1_mouseDownHandler(event:MouseEvent):void
 			{
-				this._originalStageX = stage.mouseX;
-				this._originalStageY = stage.mouseY;
+				var p:Point = this.localToGlobal( new Point( 0,0 ) );
+				this._originalStageX = p.x;
+				this._originalStageY = p.y;
+				
+				
+				this._originalStageMouseX = stage.mouseX;
+				this._originalStageMouseY = stage.mouseY;
 				
 				this._originalSelfX = this.x;
 				this._originalSelfY = this.y
@@ -59,9 +69,19 @@
 				this.dispatchEvent( new HandleEvent ( HandleEvent.MOVE_BEGIN ));
 			}
 			
+			
+			public var maxStageX:int = -1;
+			public var minStageX:int = -1;
+			public var maxStageY:int = -1;
+			public var minStageY:int = -1;
+			
+			
+			
 			private function _moving(e:MouseEvent):void{
-				var deltaX:int = stage.mouseX - this._originalStageX;
-				var deltaY:int = stage.mouseY - this._originalStageY;
+				
+				
+				var deltaX:int = this.getRestrictedDeltaX();
+				var deltaY:int = this.getRestrictedDeltaY();
 				
 				if( this.enableX){
 					this.x = this._originalSelfX + deltaX;}
@@ -90,15 +110,69 @@
 			
 			public function getDeltaY():int{
 				if( this.enableY){
-					var deltaY:int = stage.mouseY - this._originalStageY;
+					var deltaY:int = stage.mouseY - this._originalStageMouseY;
 					return deltaY;
+				}else{
+					return 0;
+				}
+			}
+			
+			
+			public function getRestrictedDeltaY():int{
+				if (this.enableY){
+					var deltaY:int = stage.mouseY - this._originalStageMouseY;
+					if ( this.maxStageY >= 0&& 
+						stage.mouseY >= this.maxStageY ){
+						deltaY = this.maxStageY - this._originalStageMouseY;
+						if (deltaY < 0)
+							deltaY = 0;
+					}
+					
+					if ( this.minStageY >= 0 && 
+						stage.mouseY <= this.minStageY ){
+						deltaY = this.minStageY - this._originalStageMouseY;
+						if (deltaY > 0)
+							deltaY = 0;
+					}
+					return deltaY;
+				}else{
+					return 0;
+				}
+			}
+			public function getRestrictedDeltaX():int{
+				
+				
+				if (this.enableX){
+					
+					var deltaX:int = stage.mouseX - this._originalStageMouseX;
+					
+					if (deltaX > 0 ){
+						if ( this.maxStageX >= 0&& 
+							deltaX + this._originalStageX + width > this.maxStageX ){
+							deltaX = this.maxStageX - this._originalStageX - width;
+							
+							if (deltaX < 0)
+								deltaX = 0;
+						}
+					}else{
+						if ( this.minStageX >= 0 &&
+							this._originalStageX + deltaX < this.minStageX
+							){
+							deltaX =  this.minStageX - this._originalStageX;
+							
+							if (deltaX > 0)
+								deltaX = 0;
+						}
+					}
+					return deltaX;
 				}else{
 					return 0;
 				}
 			}
 			public function getDeltaX():int{
 				if (this.enableX){
-					var deltaX:int = stage.mouseX - this._originalStageX;
+					var deltaX:int = stage.mouseX - this._originalStageMouseX;
+					
 					return deltaX;
 				}else{
 					return 0;

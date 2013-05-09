@@ -19,6 +19,13 @@
 				// TODO Auto-generated method stub
 				this.width = 20;
 				this.height = 20;
+				
+				/*
+				this.maxDecreaseX = 30;
+				this.maxDecreaseY = 30;
+				this.maxIncreaseX = 30;
+				this.maxIncreaseY = 30;
+				*/
 			}
 			
 		]]>
