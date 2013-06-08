@@ -6,10 +6,6 @@ package coopci.wysiwyg
 	{
 		
 		public static var DIMENSION_CHANGED:String = "DIMENSION_CHANGED";
-		
-		
-		
-		
 		public function DesignControlDimensionEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
